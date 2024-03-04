@@ -754,7 +754,7 @@ def main():
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
-        checkpoints = [early_stop]
+        callbacks = [early_stop]
     )
 
     # Training
