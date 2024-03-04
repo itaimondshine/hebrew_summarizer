@@ -35,6 +35,13 @@ import spacy_udpipe
 from spacy_udpipe import UDPipeModel
 
 logger = logging.getLogger(__name__)
+file_handler = logging.FileHandler('logfile.log')
+
+# Create a formatter
+
+# Add the file handler to the logger
+logger.addHandler(file_handler)
+
 
 try:
     nltk.data.find("tokenizers/punkt")
