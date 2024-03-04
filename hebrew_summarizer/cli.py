@@ -5,6 +5,7 @@ import os
 import sys
 from dataclasses import dataclass, field
 from typing import Optional
+from torch.utils.data import DataLoader
 
 import datasets
 import evaluate
@@ -12,6 +13,7 @@ import nltk
 import numpy as np
 import transformers
 from datasets import load_dataset
+from transformers import AutoTokenizer, EncoderDecoderModel, EarlyStoppingCallback
 from filelock import FileLock
 from transformers import (
     AutoConfig,
@@ -118,6 +120,7 @@ class DataTrainingArguments:
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
 
+
     lang: Optional[str] = field(
         default=None, metadata={"help": "Language id for summarization."}
     )
@@ -167,7 +170,7 @@ class DataTrainingArguments:
         metadata={"help": "Overwrite the cached training and evaluation sets"},
     )
     preprocessing_num_workers: Optional[int] = field(
-        default=None,
+        default=4,
         metadata={"help": "The number of processes to use for the preprocessing."},
     )
     max_source_length: Optional[int] = field(
@@ -348,6 +351,7 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
+    training_args.num_train_epochs = 100
     # Setup logging
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -440,6 +444,7 @@ def main():
     # Load pretrained model and tokenizer
     #
     # Distributed training:
+    # The .from_pretrained methods guarantee that only one local process can concurrently
     # The .from_pretrained methods guarantee that only one local process can concurrently
     # download model & vocab.
     config = AutoConfig.from_pretrained(
@@ -723,6 +728,16 @@ def main():
         result["gen_len"] = np.mean(prediction_lens)
         return result
 
+    training_args.metric_for_best_model = 'eval_loss'
+
+    early_stop = EarlyStoppingCallback(3)
+
+
+    num_workers = 4  # You can adjust this value based on your system specifications
+
+    training_args.gradient_accumulation_steps = 4
+    training_args.dataloader_num_workers = 4
+    training_args.dataloader_prefetch_factor = 2
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
         model=model,
@@ -732,6 +747,7 @@ def main():
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
+        checkpoints = [early_stop]
     )
 
     # Training
@@ -743,6 +759,7 @@ def main():
             checkpoint = last_checkpoint
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         trainer.save_model()  # Saves the tokenizer too for easy upload
+
 
         metrics = train_result.metrics
         max_train_samples = (
