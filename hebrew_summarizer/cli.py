@@ -358,12 +358,12 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-    training_args.num_train_epochs = 100
+    training_args.num_train_epochs = 30
     # Setup logging
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
         datefmt="%m/%d/%Y %H:%M:%S",
-        handlers=[logging.StreamHandler(sys.stdout)],
+        handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler('eval.log')],
     )
     log_level = training_args.get_process_log_level()
     logger.setLevel(log_level)
