@@ -744,14 +744,14 @@ def main():
 
     num_workers = 4  # You can adjust this value based on your system specifications
 
-    training_args.gradient_accumulation_steps = 4
+    training_args.gradient_accumulation_steps = 1
     training_args.dataloader_num_workers = 4
     training_args.dataloader_prefetch_factor = 2
 
     # For debugging
 
     # training_args.debug = "debug underflow_overflow"
-
+    training_args.debug ="underflow_overflow"
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
         model=model,
@@ -761,8 +761,7 @@ def main():
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
-        callbacks = [early_stop],
-        debug="underflow_overflow"
+        callbacks = [early_stop]
     )
 
     # Training
