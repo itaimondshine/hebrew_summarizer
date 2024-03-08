@@ -480,7 +480,7 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    debug_overflow = DebugUnderflowOverflow(model, trace_batch_nums=[1, 3])
+    # debug_overflow = DebugUnderflowOverflow(model, trace_batch_nums=[1, 3])
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
@@ -739,7 +739,7 @@ def main():
 
     training_args.metric_for_best_model = 'eval_loss'
 
-    early_stop = EarlyStoppingCallback(3)
+    early_stop = EarlyStoppingCallback(2)
 
 
     num_workers = 4  # You can adjust this value based on your system specifications
@@ -751,7 +751,7 @@ def main():
     # For debugging
 
     # training_args.debug = "debug underflow_overflow"
-    training_args.debug ="underflow_overflow"
+    training_args.debug = "underflow_overflow"
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
         model=model,
