@@ -29,6 +29,7 @@ from transformers import (
     Seq2SeqTrainingArguments,
     set_seed,
 )
+from transformers.debug_utils import DebugUnderflowOverflow
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import is_offline_mode
 import spacy_udpipe
@@ -479,6 +480,7 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
+    debug_overflow = DebugUnderflowOverflow(model, trace_batch_nums=[1, 3])
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
@@ -745,6 +747,11 @@ def main():
     training_args.gradient_accumulation_steps = 4
     training_args.dataloader_num_workers = 4
     training_args.dataloader_prefetch_factor = 2
+
+    # For debugging
+
+    # training_args.debug = "debug underflow_overflow"
+
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
         model=model,
@@ -754,7 +761,8 @@ def main():
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
-        callbacks = [early_stop]
+        callbacks = [early_stop],
+        debug="underflow_overflow"
     )
 
     # Training
