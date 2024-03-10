@@ -735,11 +735,12 @@ def main():
             np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds
         ]
         result["gen_len"] = np.mean(prediction_lens)
+        print(result)
         return result
 
-    training_args.metric_for_best_model = 'eval_loss'
+    training_args.metric_for_best_model = 'rouge2'
 
-    early_stop = EarlyStoppingCallback(2)
+    early_stop = EarlyStoppingCallback(5)
 
 
     num_workers = 4  # You can adjust this value based on your system specifications
