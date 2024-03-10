@@ -359,7 +359,7 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-    training_args.num_train_epochs = 30
+    training_args.num_train_epochs = 100
     # Setup logging
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -745,7 +745,7 @@ def main():
 
     num_workers = 4  # You can adjust this value based on your system specifications
 
-    training_args.gradient_accumulation_steps = 1
+    training_args.gradient_accumulation_steps = 4
     training_args.dataloader_num_workers = 4
     training_args.dataloader_prefetch_factor = 2
 
