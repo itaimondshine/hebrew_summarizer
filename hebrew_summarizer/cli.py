@@ -359,7 +359,7 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-    training_args.num_train_epochs = 100
+    training_args.num_train_epochs = 30
     # Setup logging
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -374,10 +374,9 @@ def main():
     transformers.utils.logging.enable_explicit_format()
 
     # Log on each process the small summary:
-    training_args.bf16 = True
     logger.warning(
         f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
-        + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.bf16}"
+        + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
     )
     logger.info(f"Training/evaluation parameters {training_args}")
 
@@ -690,9 +689,6 @@ def main():
     label_pad_token_id = (
         -100 if data_args.ignore_pad_token_for_loss else tokenizer.pad_token_id
     )
-
-    training_args.fp16 = False
-    training_args.bf16 = True
     data_collator = DataCollatorForSeq2Seq(
         tokenizer,
         model=model,
@@ -742,7 +738,7 @@ def main():
         print(result)
         return result
 
-    training_args.metric_for_best_model = 'rouge1'
+    training_args.metric_for_best_model = 'eval_loss'
 
     early_stop = EarlyStoppingCallback(5)
 
@@ -755,6 +751,7 @@ def main():
 
     # For debugging
 
+    # training_args.debug = "debug underflow_overflow"
     training_args.debug = "underflow_overflow"
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
