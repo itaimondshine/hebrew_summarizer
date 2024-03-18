@@ -745,7 +745,6 @@ def main():
 
     num_workers = 4  # You can adjust this value based on your system specifications
 
-    training_args.gradient_accumulation_steps = 16
     training_args.dataloader_num_workers = 4
     training_args.dataloader_prefetch_factor = 2
 
@@ -803,7 +802,7 @@ def main():
     if training_args.do_eval:
         logger.info("*** Evaluate ***")
         metrics = trainer.evaluate(
-            max_length=max_length, num_beams=num_beams, metric_key_prefix="eval"
+            max_length=256, num_beams=num_beams, metric_key_prefix="eval"
         )
         max_eval_samples = (
             data_args.max_eval_samples
