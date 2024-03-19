@@ -191,7 +191,7 @@ class DataTrainingArguments:
         },
     )
     max_target_length: Optional[int] = field(
-        default=128,
+        default=256,
         metadata={
             "help": (
                 "The maximum total sequence length for target text after tokenization. Sequences longer "
@@ -200,7 +200,7 @@ class DataTrainingArguments:
         },
     )
     val_max_target_length: Optional[int] = field(
-        default=None,
+        default=256,
         metadata={
             "help": (
                 "The maximum total sequence length for validation target text after tokenization. Sequences longer "
@@ -461,6 +461,7 @@ def main():
         else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
+        max_new_tokens = 256,
         use_auth_token=True if model_args.use_auth_token else None,
     )
     tokenizer = AutoTokenizer.from_pretrained(
@@ -627,7 +628,7 @@ def main():
 
         model_inputs["labels"] = labels["input_ids"]
         return model_inputs
-
+    training_args.generation_max_length = 256
     if training_args.do_train:
         if "train" not in raw_datasets:
             raise ValueError("--do_train requires a train dataset")
@@ -740,7 +741,7 @@ def main():
 
     training_args.metric_for_best_model = 'eval_loss'
 
-    early_stop = EarlyStoppingCallback(5)
+    early_stop = EarlyStoppingCallback(4)
 
 
     num_workers = 4  # You can adjust this value based on your system specifications
