@@ -463,6 +463,7 @@ def main():
         revision=model_args.model_revision,
         max_new_tokens = 256,
         use_auth_token=True if model_args.use_auth_token else None,
+        device_map="auto"
     )
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.tokenizer_name
@@ -472,7 +473,7 @@ def main():
         use_fast=model_args.use_fast_tokenizer,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
-        low_cpu_mem_usage=True
+        device_map = "auto"
     )
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
@@ -481,8 +482,7 @@ def main():
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
-        low_cpu_mem_usage=True
-    )
+        device_map="auto"    )
     # debug_overflow = DebugUnderflowOverflow(model, trace_batch_nums=[1, 3])
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
