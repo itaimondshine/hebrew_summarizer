@@ -472,6 +472,7 @@ def main():
         use_fast=model_args.use_fast_tokenizer,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
+        low_cpu_mem_usage=True
     )
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
@@ -480,6 +481,7 @@ def main():
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
+        low_cpu_mem_usage=True
     )
     # debug_overflow = DebugUnderflowOverflow(model, trace_batch_nums=[1, 3])
 
