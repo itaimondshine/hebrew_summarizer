@@ -739,7 +739,7 @@ def main():
         print(result)
         return result
 
-    training_args.metric_for_best_model = 'eval_loss'
+    training_args.metric_for_best_model = 'rouge1'
 
     early_stop = EarlyStoppingCallback(4)
 
