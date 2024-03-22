@@ -764,7 +764,6 @@ def main():
         compute_metrics=compute_metrics if training_args.predict_with_generate else None,
         callbacks = [early_stop]
     )
-
     # Training
     if training_args.do_train:
         checkpoint = None
