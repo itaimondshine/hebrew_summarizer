@@ -697,6 +697,8 @@ def main():
         pad_to_multiple_of=8 if training_args.fp16 else None,
     )
 
+    training_args.fp16 = False
+
     # Metric
     hebrew_tokenizer = UDPipeTokenizer(language="he")
     metric = evaluate.load("rouge")
