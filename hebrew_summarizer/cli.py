@@ -13,7 +13,7 @@ import nltk
 import numpy as np
 import transformers
 from datasets import load_dataset
-from transformers import AutoTokenizer, EncoderDecoderModel, EarlyStoppingCallback
+from transformers import AutoTokenizer, EncoderDecoderModel, EarlyStoppingCallback, BertTokenizer
 from filelock import FileLock
 from transformers import (
     AutoConfig,
@@ -346,6 +346,22 @@ class UDPipeTokenizer:
 
     def __call__(self, text):
         return list(self.tokenize(text))
+
+class MBertTokenizer:
+    def __init__(self, language="he"):
+        self.tokenizer = BertTokenizer.from_pretrained('onlplab/alephbert-base')
+
+    def tokenize(self, text):
+        return self.tokenizer.tokenize(text)
+
+    def sentencize(self, text):
+        # Since BERT is not a sentence tokenizer, you might not have a dedicated method for sentence tokenization
+        # You can split sentences based on punctuation marks or any other rule suitable for your use case.
+        sentences = text.split('.')  # Example: split sentences based on period
+        return sentences
+
+    def __call__(self, text):
+        return self.tokenize(text)
 
 
 def main():
@@ -700,7 +716,7 @@ def main():
     training_args.fp16 = False
 
     # Metric
-    hebrew_tokenizer = UDPipeTokenizer(language="he")
+    hebrew_tokenizer = UDPipeTokenizer
     metric = evaluate.load("rouge")
 
     def postprocess_text(preds, labels):
@@ -731,7 +747,8 @@ def main():
             predictions=decoded_preds,
             references=decoded_labels,
             use_stemmer=False,
-            tokenizer=hebrew_tokenizer
+            tokenizer=MBertTokenizer,
+            model_type='onlplab/alephbert-base'
         )
         result = {k: round(v * 100, 4) for k, v in result.items()}
         prediction_lens = [
@@ -741,7 +758,7 @@ def main():
         print(result)
         return result
 
-    training_args.metric_for_best_model = 'rouge1'
+    training_args.metric_for_best_model = 'f1'
 
     early_stop = EarlyStoppingCallback(4)
 
