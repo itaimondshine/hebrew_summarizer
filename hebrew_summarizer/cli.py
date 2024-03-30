@@ -758,6 +758,7 @@ def main():
         print(result)
         return result
 
+    training_args.load_best_model_at_end = True
     training_args.metric_for_best_model = 'f1'
 
     early_stop = EarlyStoppingCallback(4)
