@@ -717,7 +717,8 @@ def main():
 
     # Metric
     hebrew_tokenizer = UDPipeTokenizer
-    metric = evaluate.load("rouge")
+    import bert_score
+    metric = evaluate.load("bertscore")
 
     def postprocess_text(preds, labels):
         preds = [pred.strip() for pred in preds]
@@ -750,6 +751,7 @@ def main():
             tokenizer=MBertTokenizer,
             model_type='onlplab/alephbert-base'
         )
+        import bert_score
         result = {k: round(v * 100, 4) for k, v in result.items()}
         prediction_lens = [
             np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds
